@@ -14,7 +14,7 @@
       display: flex;
       flex-direction: column;
       gap: 24px;
-      max-width: 1300px;
+      max-width: 1550px;
       margin-left: auto;
       margin-right: auto;
       box-sizing: border-box;
@@ -69,7 +69,7 @@
       border-bottom: 1px solid #1a1c23;
     }
     
-    /* Layout grid */
+    /* Layout grid - 3 Columns (IDE Sidebar | Config & Queue | Live Generation) */
     .grid-container {
       display: grid;
       grid-template-columns: 1fr;
@@ -77,7 +77,7 @@
     }
     @media (min-width: 1024px) {
       .grid-container {
-        grid-template-columns: 1fr 1.8fr;
+        grid-template-columns: 0.9fr 1.1fr 1.5fr;
       }
     }
     
@@ -97,6 +97,9 @@
     .color-block-cyan {
       border-left: 6px solid #00e5ff;
     }
+    .color-block-gray {
+      border-left: 6px solid #8c92a0;
+    }
     
     .panel-header {
       display: flex;
@@ -112,6 +115,7 @@
     }
     .magenta-text { color: #e040fb; }
     .cyan-text { color: #00e5ff; }
+    .gray-text { color: #8c92a0; }
     
     /* Form controls */
     .form-group {
@@ -174,6 +178,25 @@
       background-color: #42e058;
       box-shadow: 0 0 10px rgba(39, 201, 63, 0.4);
     }
+    .btn-sidebar-tool {
+      background-color: #262838;
+      border: 1px solid #3c4052;
+      color: #eceff1;
+      padding: 8px 12px;
+      font-size: 11px;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 3px;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-sidebar-tool:hover {
+      background-color: #32354a;
+      border-color: #00e5ff;
+    }
     
     /* Queue List */
     .queue-container {
@@ -222,6 +245,30 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    
+    /* Project History list */
+    .history-container {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+    .history-item {
+      font-size: 10px;
+      padding: 6px 8px;
+      background-color: #0d0e12;
+      border: 1px solid #2a2d37;
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: #8c92a0;
+    }
+    .history-item:hover {
+      border-color: #8c92a0;
+      color: #fff;
     }
     
     /* Preview Frame */
@@ -309,7 +356,44 @@
 
   <div class="grid-container">
     
-    <!-- Left Column: Config & Queue -->
+    <!-- Sidebar: IDE Project Explorer -->
+    <div class="color-block-panel color-block-gray">
+      <div class="panel-header">
+        <span class="panel-title gray-text"># 00_IDE_EXPLORER</span>
+        <span style="font-size: 9px; color: #535868;">workspace</span>
+      </div>
+      
+      <!-- Target Output Folder -->
+      <div class="form-group">
+        <label>Cartella Destinazione Asset</label>
+        <input type="text" id="custom-output-path" class="terminal-input" placeholder="C:\...\assets\sprites" style="font-size: 10px;">
+        <span style="font-size: 8px; color: #6e7382; margin-top: -2px;">Se vuota usa la cartella del progetto corrente.</span>
+        <button id="btn-save-path" class="btn-terminal" style="padding: 5px; font-size: 9px; background-color: #2a2d37;">Salva Percorso</button>
+      </div>
+      
+      <!-- Project History -->
+      <div>
+        <label style="display: block; margin-bottom: 6px;">Storico Progetti / Cartelle</label>
+        <div id="project-history" class="history-container">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+      
+      <!-- Sprite Editors & Previewers -->
+      <div style="border-top: 1px solid #2a2d37; padding-top: 12px; display: flex; flex-direction: column; gap: 10px;">
+        <label>Strumenti di Animazione</label>
+        
+        <button onclick="window.open('http://localhost:9001', '_blank')" class="btn-sidebar-tool">
+          🎨 Apri Piskel Editor <span style="font-size: 8px; color: #8c92a0; margin-left: auto;">port 9001</span>
+        </button>
+        
+        <button onclick="window.open('http://localhost:9002', '_blank')" class="btn-sidebar-tool">
+          🎬 Apri Preview Animator <span style="font-size: 8px; color: #8c92a0; margin-left: auto;">port 9002</span>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Middle Column: Config & Queue -->
     <div class="color-block-panel color-block-magenta">
       <div class="panel-header">
         <span class="panel-title magenta-text"># 01_CONFIGURATION & QUEUE</span>
@@ -403,15 +487,19 @@
   </div>
 
   <script>
+    // Default Workspace configuration
+    const DEFAULT_WORKSPACE = "C:\\Users\\39349\\Favorites\\Incremental Idle Rogue Lite\\assets\\sprites";
+
     // State management
     let queue = [
-      { id: 1, prompt: 'Warrior character walking, 16-bit retro game pixel art style, side-view profile, transparent background', folder: 'classes', fileName: 'char_warrior.png', status: 'idle' },
-      { id: 2, prompt: 'Mage character holding glowing magic staff, 16-bit retro game pixel art style, side-view profile, transparent background', folder: 'classes', fileName: 'char_mage.png', status: 'idle' },
-      { id: 3, prompt: 'Skeleton king boss with golden crown, 16-bit retro game pixel art style, front view, transparent background', folder: 'enemies', fileName: 'boss_skeleton.png', status: 'idle' },
+      { id: 1, prompt: 'Warrior hero character spritesheet, horizontal animation strip with 4 frames side-by-side: frame 1 idle standing, frame 2 walking step 1, frame 3 walking step 2, frame 4 slashing sword attack. Steel armor, identical character design and colors across all frames, 16-bit retro RPG pixel art style, transparent background, grid layout', folder: 'classes', fileName: 'warrior_spritesheet.png', status: 'idle' },
+      { id: 2, prompt: 'Mage wizard character spritesheet, horizontal animation strip with 4 frames side-by-side: frame 1 idle standing, frame 2 walking stride, frame 3 casting glowing spell, frame 4 hurt/damage. Blue robes and magic staff, identical character design and colors across all frames, 16-bit retro RPG pixel art style, transparent background, grid layout', folder: 'classes', fileName: 'mage_spritesheet.png', status: 'idle' },
+      { id: 3, prompt: 'Festering Hydra boss spritesheet, horizontal animation strip with 3 frames side-by-side: frame 1 idle standing 3 heads, frame 2 biting forward 3 heads, frame 3 spitting green acid. Venomous green color, identical design across all frames, 16-bit retro RPG pixel art style, transparent background', folder: 'enemies', fileName: 'boss_hydra_spritesheet.png', status: 'idle' },
     ];
     let activeIdx = 0;
     let currentImageBase64 = null;
     let isLoading = false;
+    let projectHistory = [DEFAULT_WORKSPACE];
 
     // DOM Elements
     const apiKeyInput = document.getElementById('api-key');
@@ -432,15 +520,63 @@
     const promptDropZone = document.getElementById('prompt-drop-zone');
     const promptFileInput = document.getElementById('prompt-file-input');
 
-    // Init API Key from LocalStorage if exists
+    // IDE Sidebar DOM
+    const customOutputPathInput = document.getElementById('custom-output-path');
+    const btnSavePath = document.getElementById('btn-save-path');
+    const projectHistoryContainer = document.getElementById('project-history');
+
+    // Load API Key & Workspace Configurations from LocalStorage
     if (localStorage.getItem('openrouter_key')) {
       apiKeyInput.value = localStorage.getItem('openrouter_key');
+    }
+    if (localStorage.getItem('custom_output_path')) {
+      customOutputPathInput.value = localStorage.getItem('custom_output_path');
+    } else {
+      customOutputPathInput.value = DEFAULT_WORKSPACE;
+    }
+    if (localStorage.getItem('project_history')) {
+      try {
+        projectHistory = JSON.parse(localStorage.getItem('project_history'));
+      } catch (err) {
+        projectHistory = [DEFAULT_WORKSPACE];
+      }
     }
 
     // Save API key when typed
     apiKeyInput.addEventListener('input', () => {
       localStorage.setItem('openrouter_key', apiKeyInput.value);
     });
+
+    // Save Output path configuration
+    btnSavePath.onclick = () => {
+      const pathValue = customOutputPathInput.value.trim();
+      if (pathValue) {
+        localStorage.setItem('custom_output_path', pathValue);
+        if (!projectHistory.includes(pathValue)) {
+          projectHistory.unshift(pathValue);
+          if (projectHistory.length > 5) projectHistory.pop();
+          localStorage.setItem('project_history', JSON.stringify(projectHistory));
+        }
+        renderHistory();
+        logText.innerText = `ide > output path set to: ${pathValue}`;
+      }
+    };
+
+    function renderHistory() {
+      projectHistoryContainer.innerHTML = '';
+      projectHistory.forEach((pathItem) => {
+        const div = document.createElement('div');
+        div.className = 'history-item';
+        div.title = pathItem;
+        div.innerText = pathItem;
+        div.onclick = () => {
+          customOutputPathInput.value = pathItem;
+          localStorage.setItem('custom_output_path', pathItem);
+          logText.innerText = `ide > switched workspace to: ${pathItem}`;
+        };
+        projectHistoryContainer.appendChild(div);
+      });
+    }
 
     // Render Queue List
     function renderQueue() {
@@ -584,12 +720,13 @@
       }
     };
 
-    // Save image to folder
+    // Save image to folder (supporting customOutputDirs)
     btnSave.onclick = async () => {
       const activeJob = queue[activeIdx];
       if (!activeJob || !currentImageBase64) return;
 
       logText.innerText = `fs > writing asset to disk...`;
+      const customPath = customOutputPathInput.value.trim();
       
       try {
         const response = await fetch('/api/save', {
@@ -599,7 +736,8 @@
             b64Data: currentImageBase64,
             folder: activeJob.folder,
             fileName: activeJob.fileName,
-            removeBg: removeBgCheck.checked
+            removeBg: removeBgCheck.checked,
+            customOutputDir: customPath || null
           })
         });
 
@@ -723,6 +861,7 @@
 
     // Initial render
     renderQueue();
+    renderHistory();
   </script>
 </body>
 </html>

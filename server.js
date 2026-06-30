@@ -127,13 +127,14 @@ app.post('/api/generate', async (req, res) => {
 
 // Endpoint: Save image to project sprites folder
 app.post('/api/save', async (req, res) => {
-  const { b64Data, folder, fileName, removeBg } = req.body;
+  const { b64Data, folder, fileName, removeBg, customOutputDir } = req.body;
 
   if (!b64Data || !folder || !fileName) {
     return res.status(400).json({ error: 'Dati mancanti (b64Data, folder, fileName)' });
   }
 
-  const targetDir = path.join(SPRITES_DIR, folder);
+  const baseDir = customOutputDir || SPRITES_DIR;
+  const targetDir = path.join(baseDir, folder);
   ensureDirectory(targetDir);
   const outputPath = path.join(targetDir, fileName);
 
