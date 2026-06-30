@@ -1,0 +1,19 @@
+{
+  "name": "asset-pipeline-desktop",
+  "version": "1.0.0",
+  "description": "Pixel art asset generation pipeline for Incremental Idle Rogue Lite",
+  "main": "main.js",
+  "scripts": {
+    "start": "node server.js",
+    "app": "electron ."
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "jimp": "^1.6.1",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0"
+  }
+}

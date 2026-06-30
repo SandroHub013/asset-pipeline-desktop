@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>agy-pipeline > terminal</title>
+  <style>
+    /* Dark terminal theme - No CDNs required */
+    body {
+      background-color: #0b0c10;
+      color: #d1d5db;
+      font-family: 'Fira Code', 'Consolas', 'Courier New', monospace;
+      margin: 0;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 1300px;
+      margin-left: auto;
+      margin-right: auto;
+      box-sizing: border-box;
+    }
+    *, *:before, *:after {
+      box-sizing: inherit;
+    }
+    
+    /* Claude Code Terminal Window */
+    .terminal-window {
+      background-color: #12131a;
+      border: 2px solid #2d3139;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+    }
+    .terminal-header {
+      background-color: #1a1c23;
+      border-bottom: 2px solid #2d3139;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+    .dots-container {
+      display: flex;
+      gap: 6px;
+    }
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+    }
+    .dot-red { background-color: #ff5f56; }
+    .dot-yellow { background-color: #ffbd2e; }
+    .dot-green { background-color: #27c93f; }
+    
+    .terminal-title {
+      font-size: 11px;
+      color: #8c92a0;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .terminal-subbar {
+      padding: 10px 16px;
+      background-color: #0a0b0e;
+      font-size: 12px;
+      display: flex;
+      justify-content: space-between;
+      color: #8c92a0;
+      border-bottom: 1px solid #1a1c23;
+    }
+    
+    /* Layout grid */
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    @media (min-width: 1024px) {
+      .grid-container {
+        grid-template-columns: 1fr 1.8fr;
+      }
+    }
+    
+    /* Flat Color Block panels */
+    .color-block-panel {
+      background-color: #16171f;
+      border: 2px solid #2a2d37;
+      border-radius: 4px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .color-block-magenta {
+      border-left: 6px solid #e040fb;
+    }
+    .color-block-cyan {
+      border-left: 6px solid #00e5ff;
+    }
+    
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #2a2d37;
+      padding-bottom: 8px;
+    }
+    .panel-title {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .magenta-text { color: #e040fb; }
+    .cyan-text { color: #00e5ff; }
+    
+    /* Form controls */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 9px;
+      color: #9ea3b0;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .terminal-input {
+      background-color: #0a0a0f;
+      border: 1px solid #2a2d37;
+      color: #fff;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-family: inherit;
+      outline: none;
+      border-radius: 3px;
+    }
+    .terminal-input:focus {
+      border-color: #00e5ff;
+    }
+    textarea.terminal-input {
+      resize: vertical;
+    }
+    
+    /* Buttons */
+    .btn-terminal {
+      background-color: #1e2030;
+      border: 2px solid #2d3139;
+      color: #eceff1;
+      padding: 10px 16px;
+      font-size: 12px;
+      font-family: inherit;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 3px;
+      text-transform: uppercase;
+      transition: all 0.15s;
+    }
+    .btn-primary-terminal {
+      background-color: #00e5ff;
+      border: 2px solid #00b2cc;
+      color: #000;
+    }
+    .btn-primary-terminal:hover {
+      background-color: #33ebff;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    }
+    .btn-success-terminal {
+      background-color: #27c93f;
+      border: 2px solid #1fa332;
+      color: #000;
+    }
+    .btn-success-terminal:hover {
+      background-color: #42e058;
+      box-shadow: 0 0 10px rgba(39, 201, 63, 0.4);
+    }
+    
+    /* Queue List */
+    .queue-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      border: 1px solid #2a2d37;
+      padding: 6px;
+      background-color: #0c0d12;
+    }
+    .queue-item {
+      padding: 10px;
+      border: 1px solid #2a2d37;
+      background-color: #0d0e12;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: border-color 0.15s;
+    }
+    .queue-item:hover {
+      border-color: #4f5363;
+    }
+    .queue-item.active {
+      border-color: #e040fb;
+      background-color: #1a1122;
+    }
+    .queue-item-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+    }
+    .queue-item-file {
+      color: #00e5ff;
+      font-weight: bold;
+    }
+    .queue-item-status {
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    .queue-item-prompt {
+      font-size: 9px;
+      color: #7c8291;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    
+    /* Preview Frame */
+    .preview-viewport {
+      background-color: #050608;
+      border: 1px solid #2a2d37;
+      border-radius: 4px;
+      min-height: 350px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .preview-image {
+      max-height: 300px;
+      max-width: 100%;
+      border: 2px solid #ff4081;
+      padding: 4px;
+      background-color: #12131a;
+      image-rendering: pixelated;
+    }
+    .placeholder-text {
+      color: #535868;
+      font-size: 12px;
+      text-align: center;
+    }
+    
+    /* Logger footer */
+    .logger-bar {
+      background-color: #000;
+      border: 1px solid #2a2d37;
+      padding: 12px;
+      font-size: 11px;
+      color: #27c93f;
+    }
+    
+    /* Drag & drop lists zone */
+    .prompt-drop-zone {
+      border: 2px dashed #e040fb;
+      padding: 15px;
+      text-align: center;
+      background-color: #151120;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+      color: #e040fb;
+      transition: background-color 0.2s;
+    }
+    .prompt-drop-zone:hover {
+      background-color: #251b36;
+    }
+    
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #2a2d37;
+      border-top-color: #00e5ff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top terminal bar -->
+  <div class="terminal-window">
+    <div class="terminal-header">
+      <div class="dots-container">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+      </div>
+      <div class="terminal-title">agy@cli: ~/asset-generation-pipeline</div>
+      <div></div>
+    </div>
+    
+    <div class="terminal-subbar">
+      <span style="color: #27c93f; font-weight: bold;">✔ pipeline_status: online</span>
+      <span>port: 9003</span>
+    </div>
+  </div>
+
+  <div class="grid-container">
+    
+    <!-- Left Column: Config & Queue -->
+    <div class="color-block-panel color-block-magenta">
+      <div class="panel-header">
+        <span class="panel-title magenta-text"># 01_CONFIGURATION & QUEUE</span>
+        <span style="font-size: 9px; color: #535868;">jobs</span>
+      </div>
+      
+      <!-- Settings -->
+      <div class="form-group">
+        <label>OpenRouter API Key</label>
+        <input type="password" id="api-key" class="terminal-input" value="">
+      </div>
+      
+      <div class="form-group">
+        <label>Image Engine</label>
+        <select id="model-select" class="terminal-input">
+          <option value="google/gemini-3-pro-image">google/gemini-3-pro-image</option>
+          <option value="google/gemini-3.1-flash-image">google/gemini-3.1-flash-image</option>
+          <option value="openai/gpt-image-2">openai/gpt-image-2</option>
+        </select>
+      </div>
+
+      <!-- Drag & Drop Prompts File Zone -->
+      <div class="prompt-drop-zone" id="prompt-drop-zone">
+        📂 Trascina qui un file TXT o JSON per caricare una coda di prompt
+        <input type="file" id="prompt-file-input" style="display: none;" accept=".txt,.json">
+      </div>
+      
+      <!-- Add to Queue -->
+      <div style="border-top: 1px solid #2a2d37; padding-top: 10px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="font-size: 9px; font-weight: bold; color: #ffd700; text-transform: uppercase;">Aggiungi Singolo Prompt</span>
+        
+        <div class="form-group">
+          <textarea id="new-prompt" class="terminal-input" rows="1" placeholder="Descrivi l'asset..."></textarea>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <select id="new-folder" class="terminal-input">
+            <option value="classes">classes/</option>
+            <option value="enemies">enemies/</option>
+            <option value="biomes">biomes/</option>
+          </select>
+          <input type="text" id="new-filename" class="terminal-input" placeholder="filename.png">
+        </div>
+        
+        <button id="btn-add-queue" class="btn-terminal" style="padding: 6px; background-color: #2a2d37;">Aggiungi</button>
+      </div>
+      
+      <!-- Queue List -->
+      <div style="border-top: 1px solid #2a2d37; padding-top: 10px;">
+        <span style="font-size: 10px; font-weight: bold; color: #8c92a0; text-transform: uppercase; display: block; margin-bottom: 6px;">Coda Pipeline</span>
+        <div id="queue-list" class="queue-container"></div>
+      </div>
+    </div>
+    
+    <!-- Right Column: Active preview -->
+    <div class="color-block-panel color-block-cyan">
+      <div class="panel-header">
+        <span class="panel-title cyan-text"># 02_LIVE_GENERATOR</span>
+        <span style="font-size: 9px; color: #535868;">active_job</span>
+      </div>
+      
+      <!-- Job Details -->
+      <div id="active-job-details" style="background-color: #0d0e12; border: 1px solid #2a2d37; padding: 12px; font-size: 11px;">
+        <!-- Filled dynamically -->
+      </div>
+      
+      <!-- Preview Frame -->
+      <div id="preview-frame" class="preview-viewport">
+        <span class="placeholder-text">[ SYSTEM_IDLE: NO_IMAGE ]</span>
+      </div>
+      
+      <!-- Actions -->
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <input type="checkbox" id="remove-bg-check" checked style="accent-color: #00e5ff;">
+          <label for="remove-bg-check" style="cursor: pointer; font-size: 11px;">Rimuovi sfondo scuro/nero automaticamente (Jimp Filter)</label>
+        </div>
+        
+        <div style="display: flex; gap: 12px;">
+          <button id="btn-generate" class="btn-terminal btn-primary-terminal" style="flex: 1;">⚡ Avvia Generazione</button>
+          <button id="btn-save" class="btn-terminal btn-success-terminal" style="flex: 1; display: none;">✓ Approva e Salva</button>
+        </div>
+      </div>
+      
+      <!-- Logger console -->
+      <div class="logger-bar">
+        bash > <span id="log-text">pipeline init: ready.</span>
+      </div>
+    </div>
+    
+  </div>
+
+  <script>
+    // State management
+    let queue = [
+      { id: 1, prompt: 'Warrior character walking, 16-bit retro game pixel art style, side-view profile, transparent background', folder: 'classes', fileName: 'char_warrior.png', status: 'idle' },
+      { id: 2, prompt: 'Mage character holding glowing magic staff, 16-bit retro game pixel art style, side-view profile, transparent background', folder: 'classes', fileName: 'char_mage.png', status: 'idle' },
+      { id: 3, prompt: 'Skeleton king boss with golden crown, 16-bit retro game pixel art style, front view, transparent background', folder: 'enemies', fileName: 'boss_skeleton.png', status: 'idle' },
+    ];
+    let activeIdx = 0;
+    let currentImageBase64 = null;
+    let isLoading = false;
+
+    // DOM Elements
+    const apiKeyInput = document.getElementById('api-key');
+    const modelSelect = document.getElementById('model-select');
+    const newPromptInput = document.getElementById('new-prompt');
+    const newFolderSelect = document.getElementById('new-folder');
+    const newFilenameInput = document.getElementById('new-filename');
+    const btnAddQueue = document.getElementById('btn-add-queue');
+    const queueListContainer = document.getElementById('queue-list');
+    
+    const activeJobDetails = document.getElementById('active-job-details');
+    const previewFrame = document.getElementById('preview-frame');
+    const btnGenerate = document.getElementById('btn-generate');
+    const btnSave = document.getElementById('btn-save');
+    const removeBgCheck = document.getElementById('remove-bg-check');
+    const logText = document.getElementById('log-text');
+    
+    const promptDropZone = document.getElementById('prompt-drop-zone');
+    const promptFileInput = document.getElementById('prompt-file-input');
+
+    // Init API Key from LocalStorage if exists
+    if (localStorage.getItem('openrouter_key')) {
+      apiKeyInput.value = localStorage.getItem('openrouter_key');
+    }
+
+    // Save API key when typed
+    apiKeyInput.addEventListener('input', () => {
+      localStorage.setItem('openrouter_key', apiKeyInput.value);
+    });
+
+    // Render Queue List
+    function renderQueue() {
+      queueListContainer.innerHTML = '';
+      queue.forEach((item, idx) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = `queue-item ${idx === activeIdx ? 'active' : ''}`;
+        itemDiv.onclick = () => selectJob(idx);
+        
+        itemDiv.innerHTML = `
+          <div class="queue-item-header">
+            <span class="queue-item-file">${item.folder}/${item.fileName}</span>
+            <span class="queue-item-status" style="color: ${
+              item.status === 'saved' ? '#27c93f' : 
+              item.status === 'failed' ? '#ff5f56' : 
+              item.status === 'generating' ? '#00e5ff' : '#8c92a0'
+            }">${item.status}</span>
+          </div>
+          <div class="queue-item-prompt">${item.prompt}</div>
+        `;
+        queueListContainer.appendChild(itemDiv);
+      });
+
+      renderActiveJob();
+    }
+
+    // Render active job details
+    function renderActiveJob() {
+      const activeJob = queue[activeIdx];
+      if (!activeJob) {
+        activeJobDetails.innerHTML = 'Coda vuota. Trascina un file di prompt o aggiungine uno sopra.';
+        btnGenerate.disabled = true;
+        btnSave.style.display = 'none';
+        return;
+      }
+
+      btnGenerate.disabled = isLoading;
+      activeJobDetails.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <span style="color: #ffd700; font-weight: bold;">JOB #${activeIdx + 1} / ${queue.length}</span>
+          <span>Target: <strong>${activeJob.folder}/${activeJob.fileName}</strong></span>
+        </div>
+        <div style="color: #d1d5db;">Prompt: "${activeJob.prompt}"</div>
+      `;
+
+      // Update button labels
+      if (currentImageBase64) {
+        btnGenerate.innerText = '🔄 Rigenera';
+        btnSave.style.display = 'block';
+      } else {
+        btnGenerate.innerText = '⚡ Avvia Generazione';
+        btnSave.style.display = 'none';
+      }
+    }
+
+    function selectJob(idx) {
+      activeIdx = idx;
+      currentImageBase64 = null;
+      previewFrame.innerHTML = '<span class="placeholder-text">[ SYSTEM_IDLE: NO_IMAGE ]</span>';
+      renderQueue();
+    }
+
+    // Add to queue
+    btnAddQueue.onclick = () => {
+      const prompt = newPromptInput.value.trim();
+      const folder = newFolderSelect.value;
+      const fileName = newFilenameInput.value.trim();
+
+      if (!prompt || !fileName) {
+        alert('Tutti i campi sono necessari.');
+        return;
+      }
+
+      queue.push({
+        id: Date.now(),
+        prompt: prompt,
+        folder: folder,
+        fileName: fileName,
+        status: 'idle'
+      });
+
+      newPromptInput.value = '';
+      newFilenameInput.value = '';
+      logText.innerText = 'queue update: new job appended.';
+      renderQueue();
+    };
+
+    // Generate Image via Express Proxy
+    btnGenerate.onclick = async () => {
+      const apiKey = apiKeyInput.value.trim();
+      if (!apiKey) {
+        alert('Inserisci l\'API Key.');
+        return;
+      }
+
+      const activeJob = queue[activeIdx];
+      if (!activeJob) return;
+
+      isLoading = true;
+      btnGenerate.disabled = true;
+      logText.innerText = `api > calling generator for "${activeJob.fileName}"...`;
+      previewFrame.innerHTML = '<div class="spinner"></div>';
+      
+      queue[activeIdx].status = 'generating';
+      renderQueue();
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: activeJob.prompt,
+            model: modelSelect.value,
+            apiKey: apiKey
+          })
+        });
+
+        const data = await response.json();
+        
+        if (data.error) {
+          logText.innerText = `error > generation failed: ${data.error}`;
+          queue[activeIdx].status = 'failed';
+          previewFrame.innerHTML = '<span class="placeholder-text" style="color: #ff5f56;">[ GENERATION_FAILED ]</span>';
+        } else {
+          currentImageBase64 = data.b64_json;
+          queue[activeIdx].status = 'generated';
+          logText.innerText = `status > asset generated. check frame.`;
+          
+          previewFrame.innerHTML = `
+            <img src="data:image/png;base64,${currentImageBase64}" class="preview-image" alt="Generated asset">
+          `;
+        }
+      } catch (err) {
+        console.error(err);
+        logText.innerText = `error > connection exception triggered.`;
+        queue[activeIdx].status = 'failed';
+        previewFrame.innerHTML = '<span class="placeholder-text" style="color: #ff5f56;">[ NETWORK_ERROR ]</span>';
+      } finally {
+        isLoading = false;
+        renderQueue();
+      }
+    };
+
+    // Save image to folder
+    btnSave.onclick = async () => {
+      const activeJob = queue[activeIdx];
+      if (!activeJob || !currentImageBase64) return;
+
+      logText.innerText = `fs > writing asset to disk...`;
+      
+      try {
+        const response = await fetch('/api/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            b64Data: currentImageBase64,
+            folder: activeJob.folder,
+            fileName: activeJob.fileName,
+            removeBg: removeBgCheck.checked
+          })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          logText.innerText = `fs > successfully saved: ${activeJob.fileName}`;
+          queue[activeIdx].status = 'saved';
+          
+          // Auto advance to next job
+          if (activeIdx < queue.length - 1) {
+            setTimeout(() => {
+              selectJob(activeIdx + 1);
+            }, 1000);
+          } else {
+            logText.innerText = `status > all pipeline assets successfully saved.`;
+          }
+        } else {
+          logText.innerText = `error > save failed: ${data.error}`;
+        }
+      } catch (err) {
+        console.error(err);
+        logText.innerText = `error > filesystem exception occurred.`;
+      } finally {
+        renderQueue();
+      }
+    };
+
+    // --- Drag & Drop Prompts Queue List ---
+    promptDropZone.onclick = () => promptFileInput.click();
+    promptFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) handlePromptFile(file);
+    });
+
+    promptDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      promptDropZone.style.backgroundColor = '#251b36';
+    });
+    promptDropZone.addEventListener('dragleave', () => {
+      promptDropZone.style.backgroundColor = '#151120';
+    });
+    promptDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      promptDropZone.style.backgroundColor = '#151120';
+      const file = e.dataTransfer.files[0];
+      if (file) handlePromptFile(file);
+    });
+
+    function handlePromptFile(file) {
+      const reader = new FileReader();
+      
+      reader.onload = function(evt) {
+        const text = evt.target.result;
+        
+        try {
+          if (file.name.endsWith('.json')) {
+            // JSON Format: [{"prompt": "...", "folder": "...", "fileName": "..."}]
+            const parsed = JSON.parse(text);
+            if (Array.isArray(parsed)) {
+              const newJobs = parsed.map(item => ({
+                id: Date.now() + Math.random(),
+                prompt: item.prompt,
+                folder: item.folder || 'classes',
+                fileName: item.fileName || 'asset.png',
+                status: 'idle'
+              }));
+              queue = [...queue, ...newJobs];
+              logText.innerText = `fs > loaded ${newJobs.length} jobs from JSON file.`;
+            } else {
+              alert('Il file JSON deve essere un array di oggetti.');
+            }
+          } else {
+            // TXT Format: folder/filename.png | prompt
+            const lines = text.split('\n');
+            const newJobs = [];
+            
+            lines.forEach((line, index) => {
+              const cleaned = line.trim();
+              if (!cleaned) return;
+              
+              let folder = 'classes';
+              let fileName = `asset_${index + 1}.png`;
+              let prompt = cleaned;
+              
+              if (cleaned.includes('|')) {
+                const parts = cleaned.split('|');
+                const pathPart = parts[0].trim();
+                prompt = parts[1].trim();
+                
+                if (pathPart.includes('/')) {
+                  const pathParts = pathPart.split('/');
+                  folder = pathParts[0].trim();
+                  fileName = pathParts[1].trim();
+                } else {
+                  fileName = pathPart;
+                }
+              }
+              
+              newJobs.push({
+                id: Date.now() + index + Math.random(),
+                prompt: prompt,
+                folder: folder,
+                fileName: fileName,
+                status: 'idle'
+              });
+            });
+
+            queue = [...queue, ...newJobs];
+            logText.innerText = `fs > loaded ${newJobs.length} jobs from TXT file.`;
+          }
+          
+          renderQueue();
+        } catch (err) {
+          console.error(err);
+          alert('Errore nel parsing del file. Verifica il formato.');
+        }
+      };
+      
+      reader.readAsText(file);
+    }
+
+    // Initial render
+    renderQueue();
+  </script>
+</body>
+</html>
