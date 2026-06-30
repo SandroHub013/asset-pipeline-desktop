@@ -1,88 +1,48 @@
 [
   {
     "folder": "classes",
-    "fileName": "warrior_idle.png",
-    "prompt": "Warrior hero in standing idle pose, facing right, 64x64 pixel art style, 16-bit retro RPG, wearing steel plate armor, holding sword and shield, clean outlines, transparent background"
+    "fileName": "warrior_spritesheet.png",
+    "prompt": "Warrior hero character spritesheet, horizontal animation strip with 4 frames side-by-side: frame 1 idle standing, frame 2 walking step 1, frame 3 walking step 2, frame 4 slashing sword attack. Steel armor, identical character design and colors across all frames, 16-bit retro RPG pixel art style, transparent background, grid layout"
   },
   {
     "folder": "classes",
-    "fileName": "warrior_walk.png",
-    "prompt": "Warrior hero in active mid-step walking frame, walking right, 64x64 pixel art style, 16-bit retro RPG, steel plate armor, shield on arm, moving legs, clean outlines, transparent background"
+    "fileName": "mage_spritesheet.png",
+    "prompt": "Mage wizard character spritesheet, horizontal animation strip with 4 frames side-by-side: frame 1 idle standing, frame 2 walking stride, frame 3 casting glowing spell, frame 4 hurt/damage. Blue robes and magic staff, identical character design and colors across all frames, 16-bit retro RPG pixel art style, transparent background, grid layout"
   },
   {
     "folder": "classes",
-    "fileName": "warrior_attack.png",
-    "prompt": "Warrior hero in mid-swing sword attack pose, facing right, sword trail effect, 64x64 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
+    "fileName": "necromancer_spritesheet.png",
+    "prompt": "Necromancer dark wizard spritesheet, horizontal animation strip with 4 frames side-by-side: frame 1 idle standing, frame 2 walking stride, frame 3 summoning skeleton with green magic, frame 4 hurt/damage. Purple robes, identical character design and colors across all frames, 16-bit retro RPG pixel art style, transparent background, grid layout"
   },
   {
     "folder": "classes",
-    "fileName": "warrior_dead.png",
-    "prompt": "Defeated warrior hero lying flat on the ground, defeated pose, 64x64 pixel art style, 16-bit retro RPG, armor damaged, clean outlines, transparent background"
+    "fileName": "rogue_spritesheet.png",
+    "prompt": "Rogue thief character spritesheet, horizontal animation strip with 4 frames side-by-side: frame 1 idle holding daggers, frame 2 sneaking walk, frame 3 rapid dagger thrust attack, frame 4 hurt/damage. Hooded black cloak, identical character design and colors across all frames, 16-bit retro RPG pixel art style, transparent background, grid layout"
   },
   {
     "folder": "classes",
-    "fileName": "mage_idle.png",
-    "prompt": "Mage wizard hero in standing idle pose, facing right, 64x64 pixel art style, 16-bit retro RPG, blue wizard robes, holding glowing magic staff, clean outlines, transparent background"
-  },
-  {
-    "folder": "classes",
-    "fileName": "mage_cast.png",
-    "prompt": "Mage wizard hero casting magic spell, hands extended with glowing blue energy sparks, 64x64 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
-  },
-  {
-    "folder": "classes",
-    "fileName": "mage_dead.png",
-    "prompt": "Defeated mage wizard lying flat on the ground, wizard staff broken next to them, 64x64 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
-  },
-  {
-    "folder": "classes",
-    "fileName": "necromancer_idle.png",
-    "prompt": "Necromancer dark wizard in standing idle pose, facing right, 64x64 pixel art style, 16-bit retro RPG, purple robes, dark skull levitating near hand, clean outlines, transparent background"
-  },
-  {
-    "folder": "classes",
-    "fileName": "necromancer_summon.png",
-    "prompt": "Necromancer dark wizard casting summoning spell, green spirit energy flowing up, 64x64 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
+    "fileName": "ranger_spritesheet.png",
+    "prompt": "Ranger archer character spritesheet, horizontal animation strip with 4 frames side-by-side: frame 1 idle holding bow, frame 2 walking stride, frame 3 aiming bowstring, frame 4 shooting arrow. Green tunic and hood, identical character design and colors across all frames, 16-bit retro RPG pixel art style, transparent background, grid layout"
   },
   {
     "folder": "enemies",
-    "fileName": "slime_acid.png",
-    "prompt": "Acid Slime enemy monster, cute green gelatinous glob jumping, dripping neon acid, 32x32 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
+    "fileName": "slime_acid_spritesheet.png",
+    "prompt": "Acid slime enemy spritesheet, horizontal animation strip with 3 frames side-by-side: frame 1 puddle idle, frame 2 jumping high, frame 3 landing splash. Green gelatinous slime, identical design across all frames, 16-bit retro RPG pixel art style, transparent background"
   },
   {
     "folder": "enemies",
-    "fileName": "living_anvil.png",
-    "prompt": "Living Anvil monster enemy, heavy black iron anvil with glowing red heat cracks and angry eyes, 32x32 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
+    "fileName": "living_anvil_spritesheet.png",
+    "prompt": "Living anvil monster spritesheet, horizontal animation strip with 3 frames side-by-side: frame 1 idle anvil sleeping, frame 2 angry eyes warning, frame 3 fire sparking smash attack. Black metal anvil, identical design across all frames, 16-bit retro RPG pixel art style, transparent background"
   },
   {
     "folder": "enemies",
-    "fileName": "bitey_book.png",
-    "prompt": "Bitey Book monster, flying ancient spellbook with sharp fangs, open pages, bats wings, 32x32 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
+    "fileName": "boss_hydra_spritesheet.png",
+    "prompt": "Festering Hydra boss spritesheet, horizontal animation strip with 3 frames side-by-side: frame 1 idle standing 3 heads, frame 2 biting forward 3 heads, frame 3 spitting green acid. Venomous green color, identical design across all frames, 16-bit retro RPG pixel art style, transparent background"
   },
   {
     "folder": "enemies",
-    "fileName": "boss_hydra_idle.png",
-    "prompt": "Festering Hydra boss, three-headed green serpent beast standing idle, scaly skin, 96x96 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
-  },
-  {
-    "folder": "enemies",
-    "fileName": "boss_hydra_attack.png",
-    "prompt": "Festering Hydra boss attack frame, heads biting forward and spitting green toxic bile, 96x96 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
-  },
-  {
-    "folder": "enemies",
-    "fileName": "boss_magma_titan_idle.png",
-    "prompt": "Magma Titan boss, giant rocky obsidian monster glowing with internal lava veins, idle pose, 96x96 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
-  },
-  {
-    "folder": "enemies",
-    "fileName": "boss_magma_titan_smash.png",
-    "prompt": "Magma Titan boss slam attack, smashing huge fiery fists down, debris sparks, 96x96 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
-  },
-  {
-    "folder": "enemies",
-    "fileName": "boss_world_devourer.png",
-    "prompt": "World Devourer boss, huge cosmic purple worm emerging from a black void wormhole portal, 96x96 pixel art style, 16-bit retro RPG, clean outlines, transparent background"
+    "fileName": "boss_magma_titan_spritesheet.png",
+    "prompt": "Magma Titan boss spritesheet, horizontal animation strip with 3 frames side-by-side: frame 1 idle obsidian golem, frame 2 raising fiery fists, frame 3 ground slam impact. Lava textures, identical design across all frames, 16-bit retro RPG pixel art style, transparent background"
   },
   {
     "folder": "biomes",
